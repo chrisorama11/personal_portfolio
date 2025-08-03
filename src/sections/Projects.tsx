@@ -17,8 +17,8 @@ const PROJECTS: Project[] = [
     blurb:
       "A compact web app that helps users sort waste correctly using a lightweight model. Reached Google Solutions Challenge Top 100.",
     imageSrc: "/recycle.png",
-    demoHref: "https://example.com/demo",
-    codeHref: "https://github.com/your/recycleright",
+    demoHref: "https://youtu.be/ryhq0BObrWI",
+    codeHref: "https://github.com/chrisorama11/gdsc-solution-challenge",
     tags: ["Python", "Flutter", "Embedded Systems", "Tensorflow"],
   },
   {
@@ -36,7 +36,7 @@ const PROJECTS: Project[] = [
     blurb:
       "This site! A Mac-inspired desktop with draggable, resizable windows and a terminal view.",
     imageSrc: "/website.png",
-    codeHref: "https://github.com/chrisorama11/website_2025",
+    codeHref: "https://github.com/chrisorama11/personal_portfolio",
     tags: ["React","Tailwind", "UX"],
   },
 ];
@@ -63,7 +63,7 @@ const Projects = () => {
             {/*Text*/}
             <div className="flex-1 min-w-0">
               <h3 className="text-base md:text-lg font-semibold">{p.title}</h3>
-              <p className= "text-sm text-blue-400 mt-1">{p.date}</p>
+              <p className= "text-sm text-blue-600 mt-1">{p.date}</p>
               <p className="text-sm text-gray-700 mt-1">{p.blurb}</p>
 
               {/*Tags*/}

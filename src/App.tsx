@@ -45,11 +45,16 @@ function App() {
 
 
       {activeWindow && (
-       <Window title={activeWindow.toUpperCase()} onClose={() => setActiveWindow(null)}>
+       <Window 
+          title={activeWindow.toUpperCase()} 
+          onClose={() => setActiveWindow(null)}
+          contentClassName={activeWindow === 'terminal' ? 'overflow-hidden p-0 bg-transparent' : undefined}
+          >
+          
           {activeWindow === 'about' && <About />}
           {activeWindow === 'projects' && <Projects />}
           {activeWindow === 'experience' && <Experience />}
-          {activeWindow === 'terminal' && <Terminal />}
+          {activeWindow === 'terminal' && (<Terminal onExit={() => setActiveWindow(null)} />)}
           {activeWindow === 'writing' && <Writing />}
         </Window>
       )}

@@ -4,6 +4,7 @@ type WindowProps = {
   title: string;
   children: React.ReactNode;
   onClose: () => void;
+  contentClassName?: string;
 };
 
 const MIN_W = 320;
@@ -11,7 +12,7 @@ const MIN_H = 200;
 const DEFAULT_W = 640;
 const DEFAULT_H = 420;
 
-export default function Window({ title, children, onClose }: WindowProps) {
+export default function Window({ title, children, onClose, contentClassName }: WindowProps) {
   // Safe initial viewport read
   const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
@@ -290,11 +291,12 @@ export default function Window({ title, children, onClose }: WindowProps) {
       {/* Content */}
       {!minimized && (
         <div
-          ref={contentRef}
-          className="w-full h-[calc(100%-28px)] overflow-auto p-4 text-sm"
+            ref={contentRef}
+            className={`w-full h-[calc(100%-28px)] overflow-auto p-4 text-sm ${contentClassName ?? ""}`}
         >
-          {children}
+            {children}
         </div>
+      
       )}
 
       {/* Resize handle (bottom-right) */}
