@@ -45,7 +45,7 @@ function App() {
 
 
       {activeWindow && (
-        <Window title={activeWindow} onClose={() => setActiveWindow(null)}>
+       <Window title={activeWindow.toUpperCase()} onClose={() => setActiveWindow(null)}>
           {activeWindow === 'about' && <About />}
           {activeWindow === 'projects' && <Projects />}
           {activeWindow === 'experience' && <Experience />}
