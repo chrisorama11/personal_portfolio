@@ -1,0 +1,2 @@
+=== About ===
+This is placeholder ASCII content for about.
