@@ -1,11 +1,9 @@
-// src/sections/Terminal.tsx
 import React, { useEffect, useMemo, useRef, useState, ReactNode } from "react";
 
 type Command = "help" | "whoami" | "experience" | "projects" | "clear" | "exit";
 const PROMPT = "chris@retro-os:~$";
 
 export default function Terminal({ onExit }: { onExit?: () => void }) {
-  // lines are ReactNode so we can mix strings with styled elements (for gradient boot)
   const [lines, setLines] = useState<ReactNode[]>([]);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
@@ -13,29 +11,27 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Apply gradient to any given node (used for boot block)
   const gradient = (node: ReactNode) => (
     <span className="bg-[linear-gradient(90deg,#3a7bd5_0%,#59e2d6_50%,#f08fc5_100%)] bg-clip-text text-transparent">
       {node}
     </span>
   );
 
-  // Boot banner
   useEffect(() => {
     const boot: ReactNode[] = [
       asciiLogo(),
-      "Chris George | Mechatronics & Biomedical Eng.",
+      "CTG | Mechatronics & Biomedical Eng. @ McMaster",
       "----------------------------------------------------------------",
-      "skills: python, c++, embedded systems, verification & validation",
-      "education: final year mechatronics & biomedical engineering @ McMaster",
-      "projects: RecycleRight • rubik’s cube solver • retro website",
-      "hobbies: pickup basketball, watching movies",
-      "links: github.com/chrisorama11  |  www.linkedin.com/in/cgeorge101",
+      "OS: Retro MacOS (web)      Shell: faux-sh",
+      "Editor: VS Code            Font: Menlo / IBM Plex Mono",
+      "Interests: UI/UX, systems, testing, algorithms",
+      "Projects: RecycleRight • Rubik’s Cube Solver • Retro Desktop UI",
+      "Links: github.com/chrisorama11  |  linkedin.com/in/chrisorama",
+      "",
       "Type `help` to see available commands.",
       "",
     ];
-    // Entire boot block in gradient
-    setLines(boot.map(gradient));
+    setLines(boot.map(gradient)); // whole boot block in gradient
     inputRef.current?.focus();
   }, []);
 
@@ -55,13 +51,13 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
         "  help        - show this help",
       ],
       whoami: (): ReactNode[] => [
-        "Chris George — Mechatronics & Biomedical Engineering @ McMaster.",
-        "Focused on building clean, testable systems and polished frontends.",
+        "CTG — Mechatronics & Biomedical Engineering @ McMaster.",
+        "I build clean, testable systems and polished front-ends.",
         "",
         "Strengths:",
-        "  • Verification & Validation, automated testing",
-        "  • React/TypeScript, Tailwind, UI/UX details",
-        "  • Algorithms and problem solving (Rubik’s solver WIP)",
+        "  • Verification & Validation, automation",
+        "  • React/TypeScript, Tailwind, UI/UX craft",
+        "  • Algorithms (Rubik’s solver WIP)",
         "",
         "Social:",
         "  • GitHub   : github.com/chrisorama11",
@@ -78,7 +74,7 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
         "Projects:",
         "  • RecycleRight — lightweight waste-sorting app (Top 100 GDSC).",
         "  • Rubik’s Cube Solver — heuristic/search-based solver (WIP).",
-        "  • Retro Desktop UI — this website; classic Mac-style desktop + terminal.",
+        "  • Retro Desktop UI — classic Mac-style desktop + terminal.",
       ],
     }),
     [onExit]
@@ -90,60 +86,30 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
     const trimmed = cmdRaw.trim();
     const cmd = trimmed as Command;
     if (!trimmed) return [];
-
     if (cmd === "clear") return "__CLEAR__";
     if (cmd === "exit") return "__EXIT__";
-
     if ((commands as any)[cmd]) return (commands as any)[cmd]();
     return [`sorry, that isn't a compatible command: ${cmdRaw}`];
   }
 
   function submit(cmdRaw: string) {
     const result = run(cmdRaw);
-
-    if (result === "__CLEAR__") {
-      setLines([]);
-    } else if (result === "__EXIT__") {
-      onExit?.();
-    } else {
-      setLines((prev) => [...prev, `${PROMPT} ${cmdRaw}`, ...result, ""]);
-    }
-
-    if (cmdRaw) {
-      setHistory((h) => [cmdRaw, ...h]);
-      setHistIdx(-1);
-    }
+    if (result === "__CLEAR__") setLines([]);
+    else if (result === "__EXIT__") onExit?.();
+    else setLines((prev) => [...prev, `${PROMPT} ${cmdRaw}`, ...result, ""]);
+    if (cmdRaw) { setHistory((h) => [cmdRaw, ...h]); setHistIdx(-1); }
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      submit(input);
-      setInput("");
-      return;
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      const nextIdx = Math.min(histIdx + 1, history.length - 1);
-      if (history[nextIdx]) {
-        setHistIdx(nextIdx);
-        setInput(history[nextIdx]);
-      }
-      return;
-    }
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      const nextIdx = Math.max(histIdx - 1, -1);
-      setHistIdx(nextIdx);
-      setInput(nextIdx === -1 ? "" : history[nextIdx]);
-      return;
-    }
+    if (e.key === "Enter") { e.preventDefault(); submit(input); setInput(""); return; }
+    if (e.key === "ArrowUp") { e.preventDefault(); const i = Math.min(histIdx + 1, history.length - 1); if (history[i]) { setHistIdx(i); setInput(history[i]); } return; }
+    if (e.key === "ArrowDown") { e.preventDefault(); const i = Math.max(histIdx - 1, -1); setHistIdx(i); setInput(i === -1 ? "" : history[i]); return; }
   }
 
   return (
     <div
       className="h-full w-full font-mono text-[13px] leading-5 text-neutral-200 select-text"
-      style={{ backgroundColor: "#211763" }} // <--bg colour
+      style={{ backgroundColor: "#0b1f3a" }} // change this HEX for shell background
     >
       <div ref={scrollerRef} className="h-full overflow-y-auto p-4">
         {lines.map((line, i) => (
@@ -151,7 +117,6 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
             {line}
           </pre>
         ))}
-
         <div className="flex items-center">
           <span className="text-neutral-400 mr-2">{PROMPT}</span>
           <input
@@ -171,12 +136,13 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
 }
 
 function asciiLogo(): string {
-    return `     _____ _______ _____ 
-    / ____|__   __/ ____|
-   | |       | | | |  __ 
-   | |       | | | | |_ |
-   | |____   | | | |__| |
-    \\_____|  |_|  \\_____|
-  `;
-  }
-  
+  return [
+    "   _____ _______ _____ ",
+    "  / ____|__   __/ ____|",
+    " | |       | | | |  __ ",
+    " | |       | | | | |_ |",
+    " | |____   | | | |__| |",
+    "  \\_____|  |_|  \\_____|",
+    "",
+  ].join("\n");
+}
