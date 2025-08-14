@@ -1,0 +1,20 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["node"],                  // ✅ Required for fs/path/process
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]                  // ✅ If you're using @/ imports
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/types"],
+  "exclude": ["node_modules"]
+}

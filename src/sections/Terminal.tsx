@@ -76,6 +76,16 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
         "  • Rubik’s Cube Solver — heuristic/search-based solver (WIP).",
         "  • Retro Desktop UI — classic Mac-style desktop + terminal.",
       ],
+
+      divya: (): ReactNode[] => [
+        "Hi what's up Divya hope you are doing well!"
+      ],
+
+      tommy: (): ReactNode[] => [
+        "Hi Tomathan hope you and Elvis are having a grand old time!"
+      ],
+
+      
     }),
     [onExit]
   );

@@ -12,6 +12,8 @@ type WindowProps = {
   zIndex?: number;
   initialX?: number;
   initialY?: number;
+  initialW?: number;
+  initialH?: number;
 };
 
 const MIN_W = 320;
@@ -31,12 +33,16 @@ export default function Window({
   zIndex = 1,
   initialX,
   initialY,
+  initialW,
+  initialH,
 }: WindowProps) {
   const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
 
-  const [w, setW] = useState(() => Math.min(DEFAULT_W, Math.round(vw * 0.9)));
-  const [h, setH] = useState(() => Math.min(DEFAULT_H, Math.round(vh * 0.7)));
+  const [w, setW] = useState(() =>
+    Math.max(MIN_W, Math.min(initialW ?? Math.min(DEFAULT_W, Math.round(vw * 0.9)), vw)));
+  const [h, setH] = useState(() =>
+    Math.max(MIN_H, Math.min(initialH ?? Math.min(DEFAULT_H, Math.round(vh * 0.7)), vh)));
 
   const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
   const [x, setX] = useState(() => {

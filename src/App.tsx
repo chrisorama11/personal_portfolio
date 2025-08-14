@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Window from "./components/Window";
 import { useWindowManager } from "./windowing/useWindowManager";
 import type { WinState, WinKind } from "./windowing/types";
@@ -9,20 +9,65 @@ import Experience from "./sections/Experience";
 import Terminal from "./sections/Terminal";
 import Writing from "./sections/Writing";
 
+/* ---------------------------------- */
+/* Desktop icons config               */
+/* ---------------------------------- */
 const icons: { kind: WinKind; label: string }[] = [
-  { kind: "about", label: "About Me" },
-  { kind: "projects", label: "Projects" },
+  { kind: "about",      label: "About Me" },
+  { kind: "projects",   label: "Projects" },
   { kind: "experience", label: "Experience" },
-  { kind: "terminal", label: "Terminal" },
-  { kind: "writing", label: "Writing" },
+  { kind: "terminal",   label: "Terminal" },
+  { kind: "writing",    label: "Writing" },
 ];
 
+
+const BASE_POS: Record<WinKind, { x: number; y: number }> = {
+  about:      { x: 320, y: 72 },  // placed to the right of icon column
+  projects:   { x: 640, y: 96 },
+  experience: { x: 420, y: 320 },
+  terminal:   { x: 720, y: 64 },
+  writing:    { x: 820, y: 320 },
+};
+
+// Mobile spawn spots (under the icon grid)
+const MOBILE_POS: Record<WinKind, { x: number; y: number }> = {
+  about:      { x: 16,  y: 360 },   // under the top icon grid, left-aligned
+  projects:   { x: 16,  y: 360 },
+  experience: { x: 16,  y: 360 },
+  terminal:   { x: 16,  y: 360 },
+  writing:    { x: 16,  y: 360 },
+};
+
+function resolvePos(kind: WinKind) {
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
+  const isMobile = vw < 640;
+
+  if (isMobile) {
+    // Spawn below the mobile icon grid
+    return MOBILE_POS[kind];
+  }
+
+  // Desktop/tablet: keep windows out of the left icon column
+  const base = BASE_POS[kind];
+  const SAFE_LEFT = 200;                // margin right of the left icon column
+  const MIN_X = SAFE_LEFT;
+  const MAX_X = Math.max(0, vw - 360);  // keep some width buffer
+
+  const x = Math.max(MIN_X, Math.min(base.x, MAX_X));
+  const y = base.y;
+
+  return { x, y };
+}
+
+/* ---------------------------------- */
+/* IconButton (inline component)      */
+/* ---------------------------------- */
 function IconButton({
   iconId,
   label,
   onClick,
 }: {
-  iconId: WinKind; // you can change to string if you prefer
+  iconId: WinKind;
   label: string;
   onClick: () => void;
 }) {
@@ -49,17 +94,13 @@ function IconButton({
   );
 }
 
-// optional: default spawn positions per app
-const DEFAULT_POS: Record<WinKind, { x: number; y: number }> = {
-  about: { x: 64, y: 80 },
-  projects: { x: 360, y: 90 },
-  experience: { x: 120, y: 320 },
-  terminal: { x: 560, y: 60 },
-  writing: { x: 740, y: 320 },
-};
-
 export default function App() {
   const { wm, open, close, minimize, toggleFullscreen, focus } = useWindowManager();
+
+  // Auto-open About on first load (every load; change to sessionStorage if you want once per session)
+  useEffect(() => {
+    open("about");
+  }, [open]);
 
   const renderContent = (w: WinState) => {
     switch (w.kind) {
@@ -106,17 +147,21 @@ export default function App() {
         </div>
       </div>
 
-      {/* Render ALL open windows */}
+      {/* Render ALL open windows in stacking order */}
       {wm.order.map((id) => {
         const w = wm.byId[id];
         if (!w.open) return null;
 
-        // Only Terminal: borderless frame + no inner padding
+        // Terminal: borderless frame + no inner padding
         const isTerminal = w.kind === "terminal";
         const frameClassName =
           isTerminal ? "bg-[#0b1f3a] border-0 shadow-none rounded-none text-neutral-200" : undefined;
         const contentClassName =
           isTerminal ? "overflow-hidden p-0 bg-transparent" : undefined;
+
+        const pos = resolvePos(w.kind);
+        const initialW = w.kind === "about" ? 840 : undefined;  // width px
+        const initialH = w.kind === "about" ? 580 : undefined;  // height px
 
         return (
           <Window
@@ -129,8 +174,10 @@ export default function App() {
             onFocus={() => focus(id)}
             contentClassName={contentClassName}
             frameClassName={frameClassName}
-            initialX={DEFAULT_POS[w.kind].x}
-            initialY={DEFAULT_POS[w.kind].y}
+            initialX={pos.x}
+            initialY={pos.y}
+            initialW={initialW}
+            initialH={initialH}
           >
             {renderContent(w)}
           </Window>
