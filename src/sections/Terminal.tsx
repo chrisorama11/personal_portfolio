@@ -24,9 +24,9 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
       "----------------------------------------------------------------",
       "OS: Retro MacOS (web)      Shell: faux-sh",
       "Editor: VS Code            Font: Menlo / IBM Plex Mono",
-      "Interests: UI/UX, systems, testing, algorithms",
+      "Interests: embedded systems, learning nre things, the raptors",
       "Projects: RecycleRight • Rubik’s Cube Solver • Retro Desktop UI",
-      "Links: github.com/chrisorama11  |  linkedin.com/in/chrisorama",
+      "Links: github.com/chrisorama11  |  https://www.linkedin.com/in/cgeorge101/",
       "",
       "Type `help` to see available commands.",
       "",
@@ -61,7 +61,7 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
         "",
         "Social:",
         "  • GitHub   : github.com/chrisorama11",
-        "  • LinkedIn : linkedin.com/in/chrisorama",
+        "  • LinkedIn : linkedin.com/in/cgeorge101/",
       ],
       experience: (): ReactNode[] => [
         "Experience:",
@@ -82,10 +82,10 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
       ],
 
       tommy: (): ReactNode[] => [
-        "Hi Tomathan hope you and Elvis are having a grand old time!"
+        "Hi <Tommy></Tommy> hope you and Elvis are having a grand old time!"
       ],
 
-      
+
     }),
     [onExit]
   );

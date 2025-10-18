@@ -22,7 +22,7 @@ const icons: { kind: WinKind; label: string }[] = [
 
 
 const BASE_POS: Record<WinKind, { x: number; y: number }> = {
-  about:      { x: 320, y: 72 },  // placed to the right of icon column
+  about:      { x: 320, y: 72 },  // tuned defaults for desktop layout
   projects:   { x: 640, y: 96 },
   experience: { x: 420, y: 320 },
   terminal:   { x: 720, y: 64 },
@@ -49,7 +49,7 @@ function resolvePos(kind: WinKind) {
 
   // Desktop/tablet: keep windows out of the left icon column
   const base = BASE_POS[kind];
-  const SAFE_LEFT = 200;                // margin right of the left icon column
+  const SAFE_LEFT = 200;                // keep a left gutter so windows don't hug the edge
   const MIN_X = SAFE_LEFT;
   const MAX_X = Math.max(0, vw - 360);  // keep some width buffer
 
@@ -94,6 +94,42 @@ function IconButton({
   );
 }
 
+/* ---------------------------------- */
+/* Dock (desktop/tablet view)         */
+/* ---------------------------------- */
+function Dock({
+  items,
+  onOpen,
+}: {
+  items: { kind: WinKind; label: string }[];
+  onOpen: (kind: WinKind) => void;
+}) {
+  return (
+    <div className="hidden sm:flex fixed bottom-6 left-1/2 -translate-x-1/2 items-end gap-4 rounded-3xl border border-white/25 bg-white/20 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-lg">
+      {items.map((item) => (
+        <button
+          key={item.kind}
+          onClick={() => onOpen(item.kind)}
+          className="group relative flex flex-col items-center outline-none"
+          aria-label={item.label}
+        >
+          <span className="pointer-events-none absolute -top-8 whitespace-nowrap rounded-md bg-black/70 px-2 py-1 text-[11px] font-medium text-white opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
+            {item.label}
+          </span>
+          <img
+            src={`/icons/${item.kind}.png`}
+            alt={item.label}
+            className="h-14 w-14 transform rounded-lg bg-white/40 p-2 shadow-md transition duration-150 group-hover:-translate-y-1 group-hover:scale-[1.08]"
+            loading="lazy"
+            decoding="async"
+          />
+          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-white/60 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function App() {
   const { wm, open, close, minimize, toggleFullscreen, focus } = useWindowManager();
 
@@ -118,7 +154,7 @@ export default function App() {
       style={{ backgroundImage: "url('/wallpaper.jpg')" }}
     >
       {/* Desktop icons */}
-      {/* Mobile/tablet: centered grid; Desktop: left column stack like ryOS */}
+      {/* Mobile/tablet: centered grid; Desktop: dock along bottom */}
       <div className="p-6">
         {/* sm and down */}
         <div className="grid grid-cols-3 gap-y-8 gap-x-6 place-items-center sm:hidden">
@@ -132,7 +168,7 @@ export default function App() {
           ))}
         </div>
 
-        {/* md and up: vertical stack on the left */}
+        {/* md and up: vertical icon stack on the left */}
         <div className="hidden sm:block">
           <div className="absolute left-6 top-16 flex flex-col gap-7">
             {icons.map((icon) => (
@@ -146,6 +182,8 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      <Dock items={icons} onOpen={open} />
 
       {/* Render ALL open windows in stacking order */}
       {wm.order.map((id) => {
