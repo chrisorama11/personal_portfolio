@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Window from "./components/Window";
 import { useWindowManager } from "./windowing/useWindowManager";
 import type { WinState, WinKind } from "./windowing/types";
@@ -19,6 +19,13 @@ const icons: { kind: WinKind; label: string }[] = [
   { kind: "terminal",   label: "Terminal" },
   { kind: "writing",    label: "Writing" },
 ];
+
+type DockItem = {
+  kind: WinKind;
+  label: string;
+  active: boolean;
+  bouncing: boolean;
+};
 
 
 const BASE_POS: Record<WinKind, { x: number; y: number }> = {
@@ -100,9 +107,11 @@ function IconButton({
 function Dock({
   items,
   onOpen,
+  onBounceComplete,
 }: {
-  items: { kind: WinKind; label: string }[];
+  items: DockItem[];
   onOpen: (kind: WinKind) => void;
+  onBounceComplete: (kind: WinKind) => void;
 }) {
   return (
     <div className="hidden sm:flex fixed bottom-6 left-1/2 -translate-x-1/2 items-end gap-4 rounded-3xl border border-white/25 bg-white/20 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-lg">
@@ -119,11 +128,16 @@ function Dock({
           <img
             src={`/icons/${item.kind}.png`}
             alt={item.label}
-            className="h-14 w-14 transform rounded-lg bg-white/40 p-2 shadow-md transition duration-150 group-hover:-translate-y-1 group-hover:scale-[1.08]"
+            className={`h-14 w-14 transform rounded-lg bg-white/40 p-2 shadow-md transition duration-150 group-hover:-translate-y-1 group-hover:scale-[1.08] ${item.bouncing ? "animate-[bounce_0.9s_ease-out_1]" : ""}`}
             loading="lazy"
             decoding="async"
+            onAnimationEnd={() => onBounceComplete(item.kind)}
           />
-          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-white/60 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+          <span
+            className={`mt-1 h-1.5 w-1.5 rounded-full bg-white/80 transition-opacity duration-150 group-hover:opacity-100 ${
+              item.active ? "opacity-100" : "opacity-0"
+            }`}
+          />
         </button>
       ))}
     </div>
@@ -132,11 +146,69 @@ function Dock({
 
 export default function App() {
   const { wm, open, close, minimize, toggleFullscreen, focus } = useWindowManager();
+  const [bounceMap, setBounceMap] = useState<Record<WinKind, boolean>>({
+    about: false,
+    projects: false,
+    experience: false,
+    terminal: false,
+    writing: false,
+  });
+  const prevOpenRef = useRef<Record<WinKind, boolean>>({
+    about: false,
+    projects: false,
+    experience: false,
+    terminal: false,
+    writing: false,
+  });
 
   // Auto-open About on first load (every load; change to sessionStorage if you want once per session)
   useEffect(() => {
     open("about");
   }, [open]);
+
+  useEffect(() => {
+    const current: Record<WinKind, boolean> = {
+      about: Boolean(wm.byId["about"]?.open),
+      projects: Boolean(wm.byId["projects"]?.open),
+      experience: Boolean(wm.byId["experience"]?.open),
+      terminal: Boolean(wm.byId["terminal"]?.open),
+      writing: Boolean(wm.byId["writing"]?.open),
+    };
+    const newlyOpened: WinKind[] = [];
+    (Object.keys(current) as WinKind[]).forEach((kind) => {
+      if (!prevOpenRef.current[kind] && current[kind]) {
+        newlyOpened.push(kind);
+      }
+    });
+    if (newlyOpened.length > 0) {
+      setBounceMap((prev) => {
+        const next = { ...prev };
+        newlyOpened.forEach((kind) => {
+          next[kind] = true;
+        });
+        return next;
+      });
+    }
+    prevOpenRef.current = current;
+  }, [wm.byId]);
+
+  const dockItems: DockItem[] = icons.map((icon) => {
+    const win = wm.byId[icon.kind];
+    const isActive = Boolean(win?.open);
+    return {
+      kind: icon.kind,
+      label: icon.label,
+      active: isActive,
+      bouncing: bounceMap[icon.kind],
+    };
+  });
+
+  const handleBounceComplete = (kind: WinKind) => {
+    setBounceMap((prev) => {
+      if (!prev[kind]) return prev;
+      return { ...prev, [kind]: false };
+    });
+  };
 
   const renderContent = (w: WinState) => {
     switch (w.kind) {
@@ -183,7 +255,7 @@ export default function App() {
         </div>
       </div>
 
-      <Dock items={icons} onOpen={open} />
+      <Dock items={dockItems} onOpen={open} onBounceComplete={handleBounceComplete} />
 
       {/* Render ALL open windows in stacking order */}
       {wm.order.map((id) => {

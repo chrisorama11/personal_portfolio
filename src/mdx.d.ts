@@ -1,5 +1,7 @@
-declare module '*.mdx' {
-    let MDXComponent: (props: any) => JSX.Element;
-    export default MDXComponent;
-  }
-  
+import type { WritingMeta } from "./writing/types";
+
+declare module "*.mdx" {
+  const MDXComponent: (props: any) => JSX.Element;
+  export const meta: WritingMeta;
+  export default MDXComponent;
+}

@@ -269,7 +269,7 @@ export default function Window({
       {!minimized && (
         <div
           ref={contentRef}
-          className={`w-full h-[calc(100%-28px)] overflow-auto p-4 text-sm ${contentClassName ?? ""}`}
+          className={`w-full h-[calc(100%-28px)] overflow-auto p-4 text-sm select-text ${contentClassName ?? ""}`}
         >
           {children}
         </div>

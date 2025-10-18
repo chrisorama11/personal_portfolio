@@ -5,3 +5,38 @@
 body {
   font-family: 'system-ui', sans-serif;
 }
+
+.writing-content ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  padding-left: 0.5rem;
+}
+
+.writing-content ol {
+  list-style: decimal;
+  margin-left: 1.5rem;
+  padding-left: 0.5rem;
+}
+
+.writing-content li + li {
+  margin-top: 0.35rem;
+}
+
+.writing-content p {
+  margin-bottom: 1rem;
+  line-height: 1.65;
+}
+
+.writing-content p:last-child {
+  margin-bottom: 0;
+}
+
+.writing-content a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.writing-content a:hover {
+  color: #1d4ed8;
+}

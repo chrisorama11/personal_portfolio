@@ -1,19 +1,28 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import FirstPost from "../../content/writing/first-post.mdx"; // Static import for now
+import { getWritingPosts } from "../../writing/getPosts";
+import type { WritingPost } from "../../writing/getPosts";
 
 export default function WritingPostPage() {
   const { slug } = useParams<{ slug: string }>();
+  const posts = useMemo(() => getWritingPosts(), []);
+  const post: WritingPost | undefined = posts.find((p) => p.slug === slug);
 
-  const posts: Record<string, React.FC> = {
-    "first-post": FirstPost,
-  };
-
-  const PostComponent = posts[slug ?? ""];
+  if (!post) {
+    return (
+      <div className="mx-auto max-w-3xl p-6 text-center text-sm text-gray-600">
+        Post not found.
+      </div>
+    );
+  }
 
   return (
-    <div className="prose dark:prose-invert max-w-3xl mx-auto p-6">
-      {PostComponent ? <PostComponent /> : <div>Post not found</div>}
+    <div className="prose dark:prose-invert mx-auto max-w-3xl p-6">
+      <h1>{post.meta.title}</h1>
+      <p className="text-sm text-gray-500">
+        {new Date(post.meta.date).toLocaleDateString()}
+      </p>
+      <post.Component />
     </div>
   );
 }
