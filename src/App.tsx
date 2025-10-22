@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Window from "./components/Window";
 import { useWindowManager } from "./windowing/useWindowManager";
 import type { WinState, WinKind } from "./windowing/types";
+import { useLocation } from "react-router-dom";
 
 import About from "./sections/About";
 import Projects from "./sections/Projects";
@@ -146,6 +147,7 @@ function Dock({
 
 export default function App() {
   const { wm, open, close, minimize, toggleFullscreen, focus } = useWindowManager();
+  const location = useLocation();
   const [bounceMap, setBounceMap] = useState<Record<WinKind, boolean>>({
     about: false,
     projects: false,
@@ -161,10 +163,27 @@ export default function App() {
     writing: false,
   });
 
-  // Auto-open About on first load (every load; change to sessionStorage if you want once per session)
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+
+  const requestedKind = useMemo<WinKind | null>(() => {
+    const openParam = searchParams.get("open");
+    if (!openParam) return null;
+    return icons.some((icon) => icon.kind === openParam) ? (openParam as WinKind) : null;
+  }, [searchParams]);
+
+  const requestedPostSlug = searchParams.get("post") ?? undefined;
+
+  // Auto-open About on first load unless a specific window was requested via query params
   useEffect(() => {
+    if (requestedKind) return;
     open("about");
-  }, [open]);
+  }, [open, requestedKind]);
+
+  useEffect(() => {
+    if (requestedKind) {
+      open(requestedKind);
+    }
+  }, [requestedKind, open]);
 
   useEffect(() => {
     const current: Record<WinKind, boolean> = {
@@ -216,7 +235,7 @@ export default function App() {
       case "projects": return <Projects />;
       case "experience": return <Experience />;
       case "terminal": return <Terminal onExit={() => close(w.id)} />;
-      case "writing": return <Writing />;
+      case "writing": return <Writing initialSlug={requestedPostSlug} />;
     }
   };
 

@@ -1,12 +1,24 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getWritingPosts } from "../writing/getPosts";
 import type { WritingPost } from "../writing/getPosts";
 
-export default function Writing() {
+type WritingProps = {
+  initialSlug?: string;
+};
+
+export default function Writing({ initialSlug }: WritingProps) {
   const posts = useMemo(() => getWritingPosts(), []);
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(() =>
-    posts.length > 0 ? posts[0].slug : null,
-  );
+  const firstSlug = posts.length > 0 ? posts[0].slug : null;
+  const initialSelected =
+    initialSlug && posts.some((post) => post.slug === initialSlug) ? initialSlug : firstSlug;
+
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(initialSelected);
+
+  useEffect(() => {
+    if (!initialSlug) return;
+    if (!posts.some((post) => post.slug === initialSlug)) return;
+    setSelectedSlug((current) => (current === initialSlug ? current : initialSlug));
+  }, [initialSlug, posts]);
 
   const selectedPost = useMemo<WritingPost | undefined>(
     () => posts.find((post) => post.slug === selectedSlug),
