@@ -14,7 +14,7 @@ type ExperienceItem = {
 const EXPERIENCE: ExperienceItem[] = [
   {
     company: "Trimble Applanix",
-    role: "Verification & Validation Enigneering Intern",
+    role: "Verification & Validation Engineering Intern",
     period: "May 2024 – Aug 2025",
     location: "Richmond Hill, ON",
     logoSrc: "trimble.png",
