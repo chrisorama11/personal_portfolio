@@ -24,7 +24,7 @@ export default function Terminal({ onExit }: { onExit?: () => void }) {
       "----------------------------------------------------------------",
       "OS: Retro MacOS (web)      Shell: faux-sh",
       "Editor: VS Code            Font: Menlo / IBM Plex Mono",
-      "Interests: embedded systems, learning nre things, the raptors",
+      "Interests: embedded systems, learning new things, the Raptors",
       "Projects: RecycleRight • Neuroplayer • Retro Desktop UI",
       "Links: github.com/chrisorama11  |  https://www.linkedin.com/in/cgeorge101/",
       "",
