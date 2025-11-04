@@ -22,13 +22,13 @@ const PROJECTS: Project[] = [
     tags: ["Python", "Flutter", "Embedded Systems", "Tensorflow"],
   },
   {
-    title: "Rubik’s Cube Solver",
+    title: "Neuroplayer",
     date: "In Progress",
     blurb:
-      "A project that uses Thistlewaite's Algorithm to inform the user how to solve their Rubik's Cube!",
-    imageSrc: "/rubikscube.jpg",
-    codeHref: "https://github.com/chrisorama11/RubiksCubeSolver",
-    tags: ["Python", "Algorithms","Typescript"],
+      "A brain-computer interface music player that uses EEG signals to control playback and recommend songs based on mental state.",
+    imageSrc: "/Neuroplayer.webp",
+    codeHref: "https://github.com/chrisorama11/neuroplayer/",
+    tags: ["Python", "Machine Learning", "EEG", "Signal Processing"],
   },
   {
     title: "Retro Desktop UI",
